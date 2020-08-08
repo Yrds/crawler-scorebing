@@ -1,3 +1,3 @@
 import crawler from "./Crawler";
 
-crawler();
+crawler().init()
