@@ -13,11 +13,14 @@
     "ts-node-dev": "^1.0.0-pre.56",
     "typescript": "^3.9.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "node-inspect": "^2.0.0"
+  },
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "inspect": "node-inspect 127.0.0.1:9229"
   },
   "keywords": [],
   "author": "",
