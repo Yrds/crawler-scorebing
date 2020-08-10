@@ -1,27 +1,67 @@
-import puppeteer, { Browser, ElementHandle } from 'puppeteer';
+import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer';
 import PageOptimizer from './PageOptimizer';
 import { noCSS, noImages } from './PageOptimizer/Optmizations';
-import parseTableValue from './Actions/parseTableValue';
+import parseTableValue, { RowValues } from './Actions/parseTableValue';
+import goToFixture from './Actions/goToFixture';
+import fs, { WriteStream } from 'fs';
+
+interface InitOptions {
+  maxResults: number;
+}
 
 interface CrawlerInterface {
-  init: () => Promise<void>;
+  init: (options: InitOptions) => Promise<RowValues[]>;
 }
 
 const Crawler = (): CrawlerInterface => {
-  const init = async (): Promise<void> => {
+  const resultsArray: RowValues[] = [];
+
+  const saveStringToFile = (path:string, data: string) => {
+    const file = fs.openSync(path, 'w');
+    fs.writeFileSync(file, data);
+  }
+
+  const getFixtureDate = async (page: Page): Promise<string> => {
+    const pageUrl = await page.url();
+    const urlParts = pageUrl.split('/');
+    return urlParts[urlParts.length-1];
+  }
+
+  //TODO finish this
+  const getPages = async (page: Page): Promise<number> => {
+    const pagination: ElementHandle | null = await page.$('ul.pagination');
+    if(!pagination) return 1;
+    return 1;
+  }
+
+  const clickTodayButton  = async (page: Page) => {
+    const todayButton = await page.waitForXPath('//li/a[. = "Today"]');
+    await Promise.all([
+      page.waitForNavigation(),
+      todayButton.click()
+    ]);
+  }
+
+  const init = async (options: InitOptions): Promise<RowValues[]> => {
     try {
       const browser = await getBrowser();
       const page = await browser.newPage();
       PageOptimizer(page).apply([noCSS]);
-      await page.goto('https://www.scorebing.com/fixtures');
-      await page.hover('.diary-table > tbody');
-      const table: ElementHandle = await page.waitForSelector('.diary-table tbody');
-      await table.evaluate((node: any) => node.style.border = "solid red 1px");
-      await parseTableValue(table);
-      await page.screenshot({path: 'screenshot.png'});
+      await goToFixture(page, '');
+      await clickTodayButton(page);
+
+      console.log('fixture', await getFixtureDate(page));
+      await page.hover('.live-list-table.diary-table > tbody');
+      const table: ElementHandle = await page.waitForSelector('.live-list-table.diary-table > tbody');
+      const tableValue = await parseTableValue(table);
+
+      resultsArray.push(...tableValue);
+      console.log(tableValue);
+
       await browser.close();
+      return resultsArray;
     } catch(err) {
-      console.error(err.message);
+      throw Error(err);
     }
   }
 
