@@ -7,7 +7,10 @@ const saveBuffer = (path: string, buffer: any) => {
   fs.writeFileSync(file, buffer);
 }
 
-crawler().init({maxResults: 100}).then(results => {
+crawler().init({maxResults: 100000}).then(results => {
+  console.log('building buffer...');
   const buffer = buildWorksheetBuffer(results);
+
+  console.log('saving buffer...');
   saveBuffer('planilha.xlsx', buffer);
 })

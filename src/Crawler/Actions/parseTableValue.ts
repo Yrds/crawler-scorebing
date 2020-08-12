@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-enum ColumnIndex {
+export enum ColumnIndex {
   LEAGUE,
   KICKOFF_TIME,
   HOME,
@@ -32,9 +32,10 @@ const parseTeam = async (handle: ElementHandle): Promise<string> => {
 
 //TODO eventsinterface
 
-interface Event {
+export interface Event {
   type: string;
   time: number;
+  description: string;
 }
 
 const parseEvents = async (handle: ElementHandle | null): Promise<Event[]> => {
@@ -50,7 +51,11 @@ const parseEvents = async (handle: ElementHandle | null): Promise<Event[]> => {
           return Number(eval(titleString.split("'")[0]));
         }
 
-        return Promise.resolve({ type: spanElement.className.toString(), time: getTime(spanElement.title)})
+        const getDescription = (titleString: string): string => {
+          return titleString.split("'")[1];
+        }
+
+        return Promise.resolve({ type: spanElement.className.toString(), time: getTime(spanElement.title), description: getDescription(spanElement.title)})
 
       });
 
