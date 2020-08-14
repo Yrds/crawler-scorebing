@@ -1,6 +1,8 @@
 # Scorebing Crawler
 
-This crawler 
+This crawler scrapp scorebing fixtures and save to a database.
+
+After that it can be exported to xlsx;
 
 ## Milestones
 
