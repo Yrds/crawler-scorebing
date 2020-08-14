@@ -1,36 +1,30 @@
 import { RowValues, ColumnIndex, Event } from '../Crawler/Actions/parseTableValue';
-import xlsx from 'node-xlsx';
+import exceljs from 'exceljs';
 
-export const buildWorksheetBuffer = (values: RowValues[]) => {
+const mountResultsData = (rowValue: RowValues) =>{
   const eventsToArray = (event: Event[]) => {
     const eventsArray: string[] = [];
 
+
     event.forEach((event: Event) => {
-      eventsArray[event.time] = event.type;
+      eventsArray[event.time] = event.description;
     })
 
     return eventsArray;
   }
 
-  const parseValues = (rowValue: RowValues) => {
-    return Object.values(rowValue).reduce((acc: any, value: any, index: ColumnIndex) => {
-      if(index === ColumnIndex.EVENTS){
-        acc.push(...eventsToArray(value as Event[]));
-      } else {
-        acc.push(value);
-      }
+  return Object.values(rowValue).reduce((acc: any, value: any, index: ColumnIndex) => {
+    if(index === ColumnIndex.EVENTS){
+      acc.push(...eventsToArray(value as Event[]));
+    } else {
+      acc.push(value);
+    }
 
-      return acc;
-    }, [])
-  }
-
-  const resultsData = values.map(rowValue => parseValues(rowValue));
-
-  const longerResults = resultsData.reduce((acc: number, value: any[]) => {
-    if(value.length > acc) acc = value.length
     return acc;
-  }, 0);
+  }, [])
+}
 
+export const createHeader = (): string[] => {
   const header: string[] = [
     'Liga',
     'KickOff',
@@ -39,12 +33,39 @@ export const buildWorksheetBuffer = (values: RowValues[]) => {
     'Visitante',
     'Meio jogo',
     'Saldo de gols',
-    ...Array.from({length: longerResults}, (x, i) => i.toString() + "'")
+    ...Array.from({length: 130}, (x, i) => i.toString() + "'")
   ];
 
-  return xlsx.build([{
-    name: 'scorebing_results',
-    data: [header, ...resultsData]
-  }]);
+  return header;
 }
 
+export const buildWorkbookBuffer = (path: string): any => {
+  const workbook = new exceljs.stream.xlsx.WorkbookWriter({
+    filename: path
+  });
+
+  return workbook;
+}
+
+export const createWorksheet = (workbook: any) => {
+  return workbook.addWorksheet('resultados');
+}
+
+export const addDataToWorksheet = (worksheet: any, values: any[], raw: boolean = false) => {
+  if(raw){
+    worksheet.addRow(values).commit();
+  }
+  else{
+    const resultsData = values.map(rowValue => mountResultsData(rowValue));
+    for(const results of resultsData){
+      worksheet.addRow(results).commit();
+    }
+  }
+}
+
+export const saveWorkbook = (workbook: any) => {
+  workbook.commit().then( () => {
+    console.log('xlsx file created');
+  })
+
+}
