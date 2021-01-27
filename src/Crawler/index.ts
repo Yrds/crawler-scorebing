@@ -1,4 +1,6 @@
 import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer';
+import cliProgress from 'cli-progress';
+import path from 'path';
 import PageOptimizer from './PageOptimizer';
 import { noCSS, noImages } from './PageOptimizer/Optmizations';
 import parseTableValue, { RowValues } from './Actions/parseTableValue';
@@ -112,9 +114,31 @@ const Crawler = (): CrawlerInterface => {
   }
 
   const getBrowser = async (): Promise<Browser> => {
+
+    console.log('creating directory...');
+    const directory = fs.mkdirSync('./puppeteer/.local-chromium', {recursive: true});
+
+    const browserFetcher = puppeteer.createBrowserFetcher({path: path.resolve('./puppeteer/.local-chromium')});
+
+    const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+
+    let first = true;
+    console.log("Downloading chromium...");
+    const revisionInfo = await browserFetcher.download('782078', (downloadBytes: number, totalBytes: number) => {
+      if(first){
+        bar1.start(totalBytes, 0);
+        first = false;
+      } else {
+        bar1.update(downloadBytes);
+      }
+    });
+    bar1.stop();
+    console.log("Download completed");
+
     try {
       return await puppeteer.launch({
-        defaultViewport: {width: 1600, height: 1600}
+        defaultViewport: {width: 1600, height: 1600},
+        executablePath: revisionInfo.executablePath
       });
     } catch(err) {
       throw Error(err.message);

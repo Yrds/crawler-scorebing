@@ -5,9 +5,9 @@ import Database from './Database';
 import Game from './Database/Models/Game';
 import Event from './Database/Models/Event';
 
-const saveBuffer = (path: string, buffer: any) => {
-  buffer.toFileAsync(path);
-}
+//const saveBuffer = (path: string, buffer: any) => {
+//  buffer.toFileAsync(path);
+//}
 
 //crawler().init({maxResults: 100000}).then(async (results) => {
 //  console.log('creating database...');
