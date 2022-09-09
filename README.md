@@ -1,5 +1,7 @@
 # Scorebing Crawler
 
+Archived: not updated anymore.
+
 This crawler scrap scorebing fixtures and save to a database.
 
 After that it can be exported to xlsx;
