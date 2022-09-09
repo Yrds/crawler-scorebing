@@ -1,6 +1,6 @@
 # Scorebing Crawler
 
-This crawler scrapp scorebing fixtures and save to a database.
+This crawler scrap scorebing fixtures and save to a database.
 
 After that it can be exported to xlsx;
 
@@ -8,5 +8,5 @@ After that it can be exported to xlsx;
 
 [x] Crawling informations
 [x] Saving to a xlsx file
-[ ] Performance on save to xlsx
+[x] Performance on save to xlsx
 [ ] Database save in case of failure
