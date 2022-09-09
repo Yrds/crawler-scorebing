@@ -138,7 +138,8 @@ const Crawler = (): CrawlerInterface => {
     try {
       return await puppeteer.launch({
         defaultViewport: {width: 1600, height: 1600},
-        executablePath: revisionInfo.executablePath
+        //executablePath: revisionInfo.executablePath,
+        headless: false,
       });
     } catch(err) {
       throw Error(err.message);
